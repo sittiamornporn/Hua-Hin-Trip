@@ -8,10 +8,12 @@
   ============================================================================
   เก็บข้อมูลเป็นไฟล์ JSON ใน GitHub (ไม่ต้องมี database)
   ทุกคน "อ่าน" data.json ได้ (รีโป public) · แอดมิน "เขียน" ด้วย GitHub Token ตอนล็อกอิน
-  ตั้งค่า: 1) เพิ่มไฟล์ data.json (เนื้อใน {}) 2) แก้บล็อก GH ด้านล่าง
-          3) สร้าง Fine-grained Token (Contents: Read and write เฉพาะรีโปนี้)
-          4) กด "เข้าสู่ระบบผู้ดูแล" แล้ววาง Token
-  ยังไม่ตั้งค่า → รันโหมด local ใช้รหัส #AdminGOE
+  จะแก้: กด "เข้าสู่ระบบผู้ดูแล" แล้ววาง Token (Contents: Read and write เฉพาะรีโปนี้)
+  ============================================================================
+  เงินกองกลาง: กองกลาง = (ผช × อัตราผช) + (ผญ × อัตราผญ)
+              คืนตามสัดส่วนที่จ่าย: ratio = เงินเหลือ ÷ กองกลาง
+              ผช คืน = อัตราผช × ratio · ผญ คืน = อัตราผญ × ratio
+              (ติดป้าย ช/ญ ที่ชื่อแต่ละคน เพื่อคำนวณจำนวนอัตโนมัติ)
   ============================================================================
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,11 +54,15 @@ body{font-family:'Sarabun',sans-serif;color:var(--ink);line-height:1.7;backgroun
 .sec-head .count{display:inline-block;margin-top:8px;font-size:.8rem;color:var(--green-2);background:#eae4d4;padding:3px 14px;border-radius:100px}
 .sec-head .count.warm{color:var(--clay);background:#f4e2d5}
 .people{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
-.person{position:relative;display:flex;align-items:center;gap:13px;background:var(--paper);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);transition:.2s ease}
-.avatar{width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;color:#fdf7ea;font-family:'Playfair Display';font-weight:600;font-size:1.1rem;background:radial-gradient(circle at 34% 30%,#4a6151,#293a30);box-shadow:0 0 0 1.5px var(--brass-soft),0 0 0 4px var(--paper),0 5px 12px rgba(43,58,48,.2)}
-.person .nm{font-family:'Trirong';font-weight:500;font-size:1.02rem;line-height:1.2;flex:1;min-width:0}
+.person{position:relative;display:flex;align-items:center;gap:10px;background:var(--paper);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);transition:.2s ease}
+.avatar{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;color:#fdf7ea;font-family:'Playfair Display';font-weight:600;font-size:1.05rem;background:radial-gradient(circle at 34% 30%,#4a6151,#293a30);box-shadow:0 0 0 1.5px var(--brass-soft),0 0 0 4px var(--paper),0 5px 12px rgba(43,58,48,.2)}
+.person .nm{font-family:'Trirong';font-weight:500;font-size:1rem;line-height:1.2;flex:1;min-width:0}
 .people.waiting .avatar{background:radial-gradient(circle at 34% 30%,#c07e57,#8a5638)}
-.person .go,.person .rm{border:none;background:none;cursor:pointer;font-size:1rem;flex:none;padding:2px 4px}
+.person .sex{flex:none;font-size:.72rem;font-weight:700;border-radius:100px;padding:2px 9px;border:1px solid transparent}
+.person .sex.M{color:#2f6b8a;background:#e2eef4}
+.person .sex.F{color:#b0568a;background:#f6e2ef}
+.editing .person .sex{cursor:pointer;border-color:currentColor}
+.person .go,.person .rm{border:none;background:none;cursor:pointer;font-size:1rem;flex:none;padding:2px 3px}
 .person .go{color:var(--clay)}
 .person .rm{color:#c0554b;font-weight:700;display:none}
 .editing .person .rm{display:inline}
@@ -64,8 +70,6 @@ body{font-family:'Sarabun',sans-serif;color:var(--ink);line-height:1.7;backgroun
 .editing .person .nm:focus{outline-color:var(--brass);outline-style:solid}
 .add-btn{grid-column:1/-1;border:1.5px dashed var(--brass-soft);background:#fffdf6;color:var(--brass);font-family:'Trirong';font-size:.9rem;padding:11px;border-radius:14px;cursor:pointer;display:none}
 .editing .add-btn{display:block}
-.person.moving{animation:pop .45s ease}
-@keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1)}}
 .day{margin-bottom:30px}
 .day-head{position:relative;border-radius:18px;overflow:hidden;padding:18px 20px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
 .day.d1 .day-head{background:linear-gradient(120deg,#3d5445,#2b3a30)}
@@ -77,8 +81,7 @@ body{font-family:'Sarabun',sans-serif;color:var(--ink);line-height:1.7;backgroun
 .tl{position:relative;padding-left:22px}
 .tl::before{content:"";position:absolute;left:5px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,var(--brass-soft),var(--line))}
 .day.d2 .tl::before{background:linear-gradient(180deg,#e0bd9c,var(--line))}
-.editing .tl{padding-left:0}
-.editing .tl::before{display:none}
+.editing .tl{padding-left:0}.editing .tl::before{display:none}
 .ev{position:relative;display:flex;gap:14px;padding-bottom:14px}
 .ev::before{content:"";position:absolute;left:-22px;top:16px;width:11px;height:11px;border-radius:50%;background:var(--brass);border:3px solid var(--cream);box-shadow:0 0 0 1px var(--brass-soft)}
 .day.d2 .ev::before{background:var(--clay);box-shadow:0 0 0 1px #e0bd9c}
@@ -96,7 +99,6 @@ body{font-family:'Sarabun',sans-serif;color:var(--ink);line-height:1.7;backgroun
 .map{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
 .map a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:.82rem;font-weight:600;color:#fff;background:linear-gradient(120deg,#3d5445,#2b3a30);padding:7px 15px;border-radius:100px;box-shadow:0 6px 14px rgba(43,58,48,.2)}
 .map .nolink{font-size:.76rem;color:var(--muted);font-style:italic}
-/* ===== ACTIVITY EDIT CARD ===== */
 .ev-edit{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:12px;box-shadow:var(--shadow)}
 .ev-edit .r{display:flex;gap:8px;margin-bottom:8px;align-items:center}
 .ev-edit input{font-family:'Sarabun';font-size:.9rem;border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%;background:#fff;color:var(--ink)}
@@ -105,27 +107,31 @@ body{font-family:'Sarabun',sans-serif;color:var(--ink);line-height:1.7;backgroun
 .ev-edit .time-in{width:84px;text-align:center;flex:none}
 .ev-edit .dash{color:var(--muted);flex:none}
 .ev-edit .flags{display:flex;gap:18px;align-items:center;margin:6px 2px 8px;font-size:.85rem;color:var(--green-2)}
-.ev-edit .flags label{display:flex;align-items:center;gap:6px;cursor:pointer}
-.ev-edit .flags input{width:auto}
+.ev-edit .flags label{display:flex;align-items:center;gap:6px;cursor:pointer}.ev-edit .flags input{width:auto}
 .ev-edit .ctrls{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
 .ev-edit .ctrls button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 12px;cursor:pointer;font-size:.95rem;color:var(--green-2)}
 .ev-edit .ctrls button:disabled{opacity:.35;cursor:default}
 .ev-edit .ctrls .del{color:#c0554b;border-color:#e6c3b8}
 .add-act{width:100%;border:1.5px dashed var(--brass-soft);background:#fffdf6;color:var(--brass);font-family:'Trirong';font-size:.92rem;padding:11px;border-radius:14px;cursor:pointer;margin-bottom:6px}
 .map .bad{font-size:.76rem;color:#c0554b}
-.editing .edt{background:#fff;outline:1px dashed var(--brass-soft);outline-offset:2px;border-radius:4px;padding:0 3px}
-.editing .edt:focus{outline-color:var(--brass);outline-style:solid}
 /* ===== BUDGET ===== */
 .exp-card{background:var(--paper);border-radius:18px;box-shadow:var(--shadow);padding:18px}
-.fund-row{display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:2px solid var(--green)}
+.rate-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.rr{flex:1;min-width:150px;display:flex;align-items:center;gap:8px;background:#f6f1e6;border-radius:12px;padding:9px 13px;font-size:.9rem}
+.rr .rv{font-family:'Playfair Display';font-weight:700;color:var(--green);margin-left:auto}
+.rr .u{color:var(--muted);font-size:.8rem}
+.rr .rateIn{display:none;width:80px;text-align:right;font-family:'Sarabun';font-size:.88rem;border:1px solid var(--line);border-radius:8px;padding:5px 7px;margin-left:auto}
+.editing .rr .rv{display:none}.editing .rr .rateIn{display:inline-block}
+.collect{border:1px dashed var(--line);border-radius:12px;padding:6px 14px;margin-bottom:14px}
+.cl{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:.9rem}
+.cl+.cl{border-top:1px solid var(--line)}
+.cl b.n{font-family:'Playfair Display'}
+.cl .s{font-family:'Playfair Display';font-weight:600;color:var(--green)}
+.fund-row{display:flex;align-items:center;gap:10px;padding:14px 0;border-top:2px solid var(--green)}
 .fund-row .ico{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:#e8f0e6;font-size:1.2rem}
 .fund-row .lb{flex:1;font-family:'Trirong';font-weight:600;font-size:1.08rem}
 .fund-row .val{font-family:'Playfair Display';font-weight:700;font-size:1.4rem;color:var(--green);white-space:nowrap}
-.fund-row .val .cur{font-family:'Sarabun';font-size:.72rem;color:var(--muted);margin-left:3px}
-.fund-row .valIn{display:none;width:120px;text-align:right;font-family:'Sarabun';font-size:.95rem;border:1px solid var(--line);border-radius:8px;padding:7px 9px}
-.fund-row .valIn:focus{outline:none;border-color:var(--brass)}
-.editing .fund-row .val{display:none}.editing .fund-row .valIn{display:inline-block}
-.used-head{font-size:.78rem;color:var(--muted);letter-spacing:.02em;margin:16px 0 2px}
+.used-head{font-size:.78rem;color:var(--muted);letter-spacing:.02em;margin:8px 0 2px}
 .exp-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
 .exp-row .eico{width:32px;height:32px;flex:none;border-radius:9px;display:grid;place-items:center;background:#f0ebdd;font-size:.95rem}
 .exp-row .lb{flex:1;min-width:0;font-family:'Trirong';font-weight:500;font-size:.98rem}
@@ -148,18 +154,13 @@ body{font-family:'Sarabun',sans-serif;color:var(--ink);line-height:1.7;backgroun
 .remain.neg{background:#f7e8e3}.remain.neg b,.remain.neg span{color:#a5432f}
 .refund{margin-top:20px;border-top:2px solid var(--green);padding-top:16px}
 .rf-head{font-family:'Trirong';font-weight:600;color:var(--green);margin-bottom:12px}
-.rf-genders{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.rf-genders .g{display:flex;align-items:center;gap:6px;background:#f6f1e6;padding:7px 14px;border-radius:100px;font-size:.9rem}
-.rf-genders .g b{font-family:'Playfair Display'}
-.rf-genders .g input{display:none;width:52px;text-align:center;font-family:'Sarabun';font-size:.88rem;border:1px solid var(--line);border-radius:8px;padding:4px 6px}
-.editing .rf-genders .g .gv{display:none}.editing .rf-genders .g input{display:inline-block}
 .rf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .rf-box{border-radius:14px;padding:16px 12px;text-align:center;color:#fff;box-shadow:var(--shadow)}
 .rf-box.male{background:linear-gradient(135deg,#3d5445,#2b3a30)}
 .rf-box.female{background:linear-gradient(135deg,#c07e57,#9a5b3a)}
 .rf-box .t{font-size:.82rem;opacity:.92}.rf-box .w{font-size:.66rem;opacity:.7}
 .rf-box b{font-family:'Playfair Display';font-size:1.55rem;display:block;margin-top:6px}
-.rf-note{font-size:.72rem;color:var(--muted);margin-top:12px;text-align:center;line-height:1.5}
+.rf-note{font-size:.72rem;color:var(--muted);margin-top:12px;text-align:center;line-height:1.6}
 .tools{display:flex;justify-content:center;gap:10px;margin-bottom:12px}
 .btn{font-family:'Trirong';font-weight:500;font-size:.9rem;cursor:pointer;border:none;color:#fff;background:linear-gradient(120deg,#3d5445,#2b3a30);padding:9px 22px;border-radius:100px;box-shadow:0 8px 18px rgba(43,58,48,.22)}
 .btn.ghost{background:#eae4d4;color:var(--muted);box-shadow:none}
@@ -234,25 +235,27 @@ footer .t{font-family:'Playfair Display';color:var(--green);font-size:1.05rem}
   <div class="section">
     <div class="sec-head"><div class="kick">Shared Fund</div><h2>เงินกองกลาง</h2></div>
     <div class="exp-card">
-      <div class="fund-row">
-        <div class="ico">💰</div><div class="lb">เงินกองกลางรวม</div>
-        <div class="val" id="poolVal">0 <span class="cur">฿</span></div>
-        <input class="valIn" id="poolIn" type="number" min="0" step="1" inputmode="numeric">
+      <div class="rate-row">
+        <div class="rr">👨 ผช เก็บคนละ <b class="rv" id="rateMaleV">2,000</b><input class="rateIn" id="rateMaleIn" type="number" min="0" step="100"><span class="u">฿</span></div>
+        <div class="rr">👩 ผญ เก็บคนละ <b class="rv" id="rateFemaleV">1,500</b><input class="rateIn" id="rateFemaleIn" type="number" min="0" step="100"><span class="u">฿</span></div>
       </div>
+      <div class="collect">
+        <div class="cl"><span>👨 ผช <b class="n" id="mCount">0</b> คน × <span id="rmShow">2,000</span></span><span class="s" id="mSum">0 ฿</span></div>
+        <div class="cl"><span>👩 ผญ <b class="n" id="fCount">0</b> คน × <span id="rfShow">1,500</span></span><span class="s" id="fSum">0 ฿</span></div>
+      </div>
+      <div class="fund-row"><div class="ico">💰</div><div class="lb">เงินกองกลางรวม</div><div class="val" id="poolVal">0 ฿</div></div>
+
       <div class="used-head">รายการที่ใช้ไป</div>
       <div id="expList"></div>
       <button class="exp-add" id="expAdd">＋ เพิ่มรายการที่ใช้</button>
       <div class="used-total"><span class="lb">รวมที่ใช้ไป</span><span class="amt" id="expTotal">0 ฿</span></div>
       <div class="remain" id="remainBox"><span>เงินเหลือ</span><b id="remainVal">0 ฿</b></div>
+
       <div class="refund">
-        <div class="rf-head">เงินคืนต่อคน (หารเงินเหลือแบบถ่วงน้ำหนัก)</div>
-        <div class="rf-genders">
-          <div class="g">👨 ผู้ชาย <b class="gv" id="maleVal">12</b><input id="maleIn" type="number" min="0" step="1"> คน</div>
-          <div class="g">👩 ผู้หญิง <b class="gv" id="femaleVal">4</b><input id="femaleIn" type="number" min="0" step="1"> คน</div>
-        </div>
+        <div class="rf-head">เงินคืนต่อคน (คืนตามสัดส่วนที่จ่าย)</div>
         <div class="rf-grid">
-          <div class="rf-box male"><div class="t">👨 ผู้ชายได้คืน</div><div class="w">น้ำหนัก ×1</div><b id="refMale">0 ฿</b></div>
-          <div class="rf-box female"><div class="t">👩 ผู้หญิงได้คืน</div><div class="w">น้ำหนัก ×0.75</div><b id="refFemale">0 ฿</b></div>
+          <div class="rf-box male"><div class="t">👨 ผช ได้คืน</div><b id="refMale">0 ฿</b></div>
+          <div class="rf-box female"><div class="t">👩 ผญ ได้คืน</div><b id="refFemale">0 ฿</b></div>
         </div>
         <div class="rf-note" id="rfNote"></div>
       </div>
@@ -280,7 +283,6 @@ const GH={owner:"sittiamornporn",repo:"Khao-Yai-Trip",path:"data.json",branch:"m
 const LOCAL_CODE="#AdminGOE";
 const GH_READY=!GH.owner.startsWith("YOUR_");
 const TOKEN_KEY="khaoyai_gh_token";
-const FEMALE_W=0.75, MALE_W=1;
 function uid(){return 'x'+Math.random().toString(36).slice(2,9);}
 
 const DEFAULT_DAYS={
@@ -302,12 +304,12 @@ const DEFAULT_DAYS={
   {id:'b3',t:'13.00',t2:'',ico:'☕',act:'ร้านคาเฟ่',note:'แยกย้ายหลังจากคาเฟ่',opt:false,rest:false,map:''}
  ]
 };
+function M(n){return {name:n,sex:'M'};}
 const DEFAULTS={
-  confirmed:["บูม","บัว","พี่นนท์","พี่เป้","พี่บลู","พี่ป๊อป","พี่เปตอง","พี่ตอง","พี่ปุ๊ปปั๊ป","พี่ฝ้าย","พี่โฟม","พี่ตาม","พี่ไฝ","พี่เจ"],
-  waiting:["พี่แจ๊ค","พี่พี","พี่แทน","พี่กี๋","พี่วา"],
+  confirmed:["บูม","บัว","พี่นนท์","พี่เป้","พี่บลู","พี่ป๊อป","พี่เปตอง","พี่ตอง","พี่ปุ๊ปปั๊ป","พี่ฝ้าย","พี่โฟม","พี่ตาม","พี่ไฝ","พี่เจ"].map(M),
+  waiting:["พี่แจ๊ค","พี่พี","พี่แทน","พี่กี๋","พี่วา"].map(M),
   days:DEFAULT_DAYS,
-  pool:0,
-  genders:{male:12,female:4},
+  rates:{male:2000,female:1500},
   expenses:[
     {ico:"🏡",label:"ค่าที่พัก · Karun Pool Villa",amount:0},
     {ico:"🏍️",label:"ค่า ATV k.m.9",amount:0},
@@ -320,16 +322,16 @@ const DEFAULTS={
 let data=clone(DEFAULTS), sha=null, token=localStorage.getItem(TOKEN_KEY)||"";
 let isAdmin=GH_READY?!!token:false;
 let editing=false, focusActive=false, pendingRender=false, saveTimer=null;
-const LS='khaoyai_local_v10';
+const LS='khaoyai_local_v11';
 function clone(o){return JSON.parse(JSON.stringify(o));}
+function normMembers(a,def){return Array.isArray(a)?a.map(x=>(typeof x==='string')?{name:x,sex:'M'}:{name:String(x&&x.name||''),sex:(x&&x.sex==='F')?'F':'M'}):clone(def);}
 function sanitItem(x){x=x||{};return{id:x.id||uid(),t:String(x.t||''),t2:String(x.t2||''),ico:x.ico||'📍',act:String(x.act||''),note:x.note!=null?String(x.note):'',opt:!!x.opt,rest:!!x.rest,map:x.map?String(x.map):''};}
 function sanitDay(a){return Array.isArray(a)?a.map(sanitItem):[];}
-function norm(d){d=d||{};const g=d.genders||{};const dy=d.days||{};return{
-  confirmed:Array.isArray(d.confirmed)?d.confirmed.slice():clone(DEFAULTS.confirmed),
-  waiting:Array.isArray(d.waiting)?d.waiting.slice():clone(DEFAULTS.waiting),
+function norm(d){d=d||{};const r=d.rates||{};const dy=d.days||{};return{
+  confirmed:normMembers(d.confirmed,DEFAULTS.confirmed),
+  waiting:normMembers(d.waiting,DEFAULTS.waiting),
   days:{d1:(dy.d1?sanitDay(dy.d1):clone(DEFAULT_DAYS.d1)),d2:(dy.d2?sanitDay(dy.d2):clone(DEFAULT_DAYS.d2))},
-  pool:Number(d.pool)||0,
-  genders:{male:Number(g.male)||0,female:Number(g.female)||0},
+  rates:{male:(r.male!=null?Number(r.male):2000),female:(r.female!=null?Number(r.female):1500)},
   expenses:Array.isArray(d.expenses)?d.expenses.map(x=>({ico:x.ico||"💸",label:String(x.label||""),amount:Number(x.amount)||0})):clone(DEFAULTS.expenses)
 };}
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
@@ -367,24 +369,27 @@ document.addEventListener('focusout',()=>{setTimeout(()=>{focusActive=false;if(p
 /* ===== MEMBERS ===== */
 const cL=document.getElementById('confirmList'),wL=document.getElementById('waitList');
 const cC=document.getElementById('confirmCount'),wC=document.getElementById('waitCount'),heroCount=document.getElementById('heroCount');
-function personRow(name,i,listKey){
+function personRow(m,i,listKey){
   const row=el('div','person');row.appendChild(el('div','avatar',String(i+1)));
-  const nm=el('div','nm',name);
-  if(editing){nm.contentEditable='true';nm.addEventListener('blur',()=>{const v=nm.textContent.trim();if(v){data[listKey][i]=v;}else{data[listKey].splice(i,1);renderAll();}commit();});}
+  const nm=el('div','nm',m.name);
+  if(editing){nm.contentEditable='true';nm.addEventListener('blur',()=>{const v=nm.textContent.trim();if(v){m.name=v;}else{data[listKey].splice(i,1);renderAll();}commit();});}
   row.appendChild(nm);
-  if(listKey==='waiting'&&editing){const up=el('button','go','↑');up.title='เลื่อนขึ้นเป็นยืนยัน';up.onclick=()=>{data.confirmed.push(name);data.waiting.splice(i,1);renderAll();commit();};row.appendChild(up);}
-  if(editing){const rm=el('button','rm','✕');rm.title='ลบชื่อ';rm.onclick=()=>{if(confirm('ลบ "'+name+'" ?')){data[listKey].splice(i,1);renderAll();commit();}};row.appendChild(rm);}
+  const sx=el('div','sex '+(m.sex==='F'?'F':'M'), m.sex==='F'?'ญ':'ช');
+  if(editing){sx.title='แตะสลับ ช/ญ';sx.onclick=()=>{m.sex=(m.sex==='F')?'M':'F';renderAll();commit();};}
+  row.appendChild(sx);
+  if(listKey==='waiting'&&editing){const up=el('button','go','↑');up.title='เลื่อนขึ้นเป็นยืนยัน';up.onclick=()=>{data.confirmed.push(m);data.waiting.splice(i,1);renderAll();commit();};row.appendChild(up);}
+  if(editing){const rm=el('button','rm','✕');rm.title='ลบชื่อ';rm.onclick=()=>{if(confirm('ลบ "'+m.name+'" ?')){data[listKey].splice(i,1);renderAll();commit();}};row.appendChild(rm);}
   return row;
 }
-function addBtn(listKey,label){const b=el('button','add-btn',label);b.onclick=()=>{const n=prompt('ชื่อที่ต้องการเพิ่ม');if(n&&n.trim()){data[listKey].push(n.trim());renderAll();commit();}};return b;}
+function addBtn(listKey,label){const b=el('button','add-btn',label);b.onclick=()=>{const n=prompt('ชื่อที่ต้องการเพิ่ม');if(n&&n.trim()){data[listKey].push({name:n.trim(),sex:'M'});renderAll();commit();}};return b;}
 function renderPeople(){
   cL.textContent='';wL.textContent='';
-  data.confirmed.forEach((n,i)=>cL.appendChild(personRow(n,i,'confirmed')));cL.appendChild(addBtn('confirmed','＋ เพิ่มชื่อผู้ยืนยัน'));
-  data.waiting.forEach((n,i)=>wL.appendChild(personRow(n,i,'waiting')));wL.appendChild(addBtn('waiting','＋ เพิ่มชื่อรอยืนยัน'));
+  data.confirmed.forEach((m,i)=>cL.appendChild(personRow(m,i,'confirmed')));cL.appendChild(addBtn('confirmed','＋ เพิ่มชื่อผู้ยืนยัน'));
+  data.waiting.forEach((m,i)=>wL.appendChild(personRow(m,i,'waiting')));wL.appendChild(addBtn('waiting','＋ เพิ่มชื่อรอยืนยัน'));
   cC.textContent=data.confirmed.length+' คน';wC.textContent=data.waiting.length+' คน';heroCount.textContent=data.confirmed.length;
 }
 
-/* ===== TIMELINE (view + edit) ===== */
+/* ===== TIMELINE ===== */
 function actViewRow(it){
   const row=el('div','ev'+(it.rest?' rest':''));
   const time=el('div','time');time.appendChild(el('b',null,it.t||'—'));if(it.t2)time.appendChild(el('small',null,it.t2));row.appendChild(time);
@@ -436,9 +441,9 @@ function renderTimeline(){renderDay('d1');renderDay('d2');}
 
 /* ===== BUDGET ===== */
 const expList=document.getElementById('expList'),expTotal=document.getElementById('expTotal');
-const poolVal=document.getElementById('poolVal'),poolIn=document.getElementById('poolIn');
-const remainBox=document.getElementById('remainBox'),remainVal=document.getElementById('remainVal');
-const maleVal=document.getElementById('maleVal'),femaleVal=document.getElementById('femaleVal'),maleIn=document.getElementById('maleIn'),femaleIn=document.getElementById('femaleIn');
+const poolVal=document.getElementById('poolVal'),remainBox=document.getElementById('remainBox'),remainVal=document.getElementById('remainVal');
+const rateMaleV=document.getElementById('rateMaleV'),rateFemaleV=document.getElementById('rateFemaleV'),rateMaleIn=document.getElementById('rateMaleIn'),rateFemaleIn=document.getElementById('rateFemaleIn');
+const mCount=document.getElementById('mCount'),fCount=document.getElementById('fCount'),mSum=document.getElementById('mSum'),fSum=document.getElementById('fSum'),rmShow=document.getElementById('rmShow'),rfShow=document.getElementById('rfShow');
 const refMale=document.getElementById('refMale'),refFemale=document.getElementById('refFemale'),rfNote=document.getElementById('rfNote');
 function expRow(item,i){
   const row=el('div','exp-row');row.appendChild(el('div','eico',item.ico||'💸'));
@@ -452,21 +457,25 @@ function expRow(item,i){
   return row;
 }
 function renderBudget(){
-  poolVal.childNodes[0].nodeValue=money(data.pool)+' ';poolIn.value=data.pool||0;
+  const rM=Number(data.rates.male)||0, rF=Number(data.rates.female)||0;
+  rateMaleV.textContent=money(rM);rateFemaleV.textContent=money(rF);rateMaleIn.value=rM;rateFemaleIn.value=rF;
+  rmShow.textContent=money(rM);rfShow.textContent=money(rF);
+  const nM=data.confirmed.filter(m=>m.sex!=='F').length, nF=data.confirmed.filter(m=>m.sex==='F').length;
+  const sM=nM*rM, sF=nF*rF, pool=sM+sF;
+  mCount.textContent=nM;fCount.textContent=nF;mSum.textContent=money(sM)+' ฿';fSum.textContent=money(sF)+' ฿';
+  poolVal.textContent=money(pool)+' ฿';
   expList.textContent='';data.expenses.forEach((it,i)=>expList.appendChild(expRow(it,i)));
   const used=data.expenses.reduce((s,x)=>s+(Number(x.amount)||0),0);expTotal.textContent=money(used)+' ฿';
-  const remain=(Number(data.pool)||0)-used;
+  const remain=pool-used;
   remainVal.textContent=money(remain)+' ฿';remainBox.classList.toggle('neg',remain<0);
   remainBox.querySelector('span').textContent=remain<0?'ใช้เกินกองกลาง':'เงินเหลือ';
-  const m=data.genders.male,f=data.genders.female;
-  maleVal.textContent=m;femaleVal.textContent=f;maleIn.value=m;femaleIn.value=f;
-  const tw=m*MALE_W+f*FEMALE_W;const perMale=tw>0?remain/tw:0;const perFemale=perMale*FEMALE_W;
-  refMale.textContent=money(Math.floor(perMale))+' ฿';refFemale.textContent=money(Math.floor(perFemale))+' ฿';
-  rfNote.textContent='ผู้ชาย ×1 · ผู้หญิง ×0.75 · เงินเหลือ '+money(remain)+' ÷ ('+m+'×1 + '+f+'×0.75 = '+(Math.round(tw*100)/100)+') = '+money(Math.floor(perMale))+'฿/ชาย';
+  const ratio=pool>0?remain/pool:0;
+  refMale.textContent=money(Math.floor(rM*ratio))+' ฿';
+  refFemale.textContent=money(Math.floor(rF*ratio))+' ฿';
+  rfNote.textContent='คืน '+Math.round(ratio*100)+'% ของที่จ่าย  ·  ratio = เงินเหลือ ÷ กองกลาง = '+ratio.toFixed(3)+'\nผช '+money(rM)+'×'+ratio.toFixed(3)+' · ผญ '+money(rF)+'×'+ratio.toFixed(3);
 }
-poolIn.addEventListener('change',()=>{data.pool=Number(poolIn.value)||0;renderBudget();commit();});
-maleIn.addEventListener('change',()=>{data.genders.male=Number(maleIn.value)||0;renderBudget();commit();});
-femaleIn.addEventListener('change',()=>{data.genders.female=Number(femaleIn.value)||0;renderBudget();commit();});
+rateMaleIn.addEventListener('change',()=>{data.rates.male=Number(rateMaleIn.value)||0;renderBudget();commit();});
+rateFemaleIn.addEventListener('change',()=>{data.rates.female=Number(rateFemaleIn.value)||0;renderBudget();commit();});
 document.getElementById('expAdd').onclick=()=>{const l=prompt('ชื่อรายการที่ใช้');if(l&&l.trim()){data.expenses.push({ico:'💸',label:l.trim(),amount:0});renderBudget();commit();}};
 
 function renderAll(){document.body.classList.toggle('editing',editing);renderPeople();renderTimeline();renderBudget();}
@@ -479,7 +488,7 @@ function updateChrome(){
   resetBtn.style.display=editing?'':'none';
   if(isAdmin){lockNote.textContent=editing?('กำลังแก้ไข · บันทึก'+(GH_READY?'ขึ้น GitHub ให้ทุกคน':'ในเครื่อง')+'อัตโนมัติ'):'คุณเป็นผู้ดูแล · กด “เข้าโหมดแก้ไข” เพื่อปรับข้อมูล';}
   else{lockNote.textContent='เฉพาะผู้ดูแลเท่านั้นที่แก้ไขได้';}
-  if(!GH_READY){modeBanner.style.display='';modeBanner.textContent='⚠ โหมด local (ยังไม่ได้ตั้งค่า GitHub) — ข้อมูลเก็บเฉพาะเครื่องนี้ ดูวิธีตั้งค่าในคอมเมนต์บนสุดของไฟล์';}
+  if(!GH_READY){modeBanner.style.display='';modeBanner.textContent='⚠ โหมด local (ยังไม่ได้ตั้งค่า GitHub)';}
 }
 
 /* ===== LOGIN ===== */

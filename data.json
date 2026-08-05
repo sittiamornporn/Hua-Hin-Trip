@@ -240,6 +240,17 @@
         "opt": true,
         "rest": false,
         "map": "https://www.google.com/maps/place/Blossom+Bloom/data=!4m2!3m1!1s0x0:0x37d54008cee97ad7?sa=X&ved=1t:2428&ictx=111"
+      },
+      {
+        "id": "xhwk7wf6",
+        "t": "12.00",
+        "t2": "",
+        "ico": "📍",
+        "act": "กิจกรรมใหม่",
+        "note": "",
+        "opt": false,
+        "rest": false,
+        "map": ""
       }
     ]
   },

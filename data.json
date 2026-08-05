@@ -173,7 +173,7 @@
       }
     ]
   },
-  "pool": 320,
+  "pool": 32000,
   "genders": {
     "male": 12,
     "female": 4

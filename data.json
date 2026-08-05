@@ -198,23 +198,23 @@
     ],
     "d2": [
       {
-        "id": "b1",
-        "t": "11.00",
-        "t2": "",
-        "ico": "🧳",
-        "act": "ออกจากบ้านพัก",
-        "note": "⏰Check-in :14:00 น. ⏰Check-out :11:00 น.",
-        "opt": false,
-        "rest": false,
-        "map": ""
-      },
-      {
         "id": "x8agryhu",
         "t": "12.00",
         "t2": "",
         "ico": "📍",
         "act": "กิจกรรมใหม่",
         "note": "",
+        "opt": false,
+        "rest": false,
+        "map": ""
+      },
+      {
+        "id": "b1",
+        "t": "11.00",
+        "t2": "",
+        "ico": "🧳",
+        "act": "ออกจากบ้านพัก",
+        "note": "⏰Check-in :14:00 น. ⏰Check-out :11:00 น.",
         "opt": false,
         "rest": false,
         "map": ""

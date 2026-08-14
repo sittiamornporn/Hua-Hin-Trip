@@ -196,6 +196,17 @@
         "opt": false,
         "rest": true,
         "map": ""
+      },
+      {
+        "id": "xf74ipxi",
+        "t": "12.00",
+        "t2": "",
+        "ico": "📍",
+        "act": "กิจกรรมใหม่",
+        "note": "",
+        "opt": false,
+        "rest": false,
+        "map": ""
       }
     ],
     "d2": [

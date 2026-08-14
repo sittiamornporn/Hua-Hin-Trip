@@ -139,7 +139,7 @@
         "act": "โขมพัสตร์ หัวหิน",
         "note": "",
         "opt": false,
-        "rest": true,
+        "rest": false,
         "map": ""
       },
       {

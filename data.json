@@ -264,7 +264,7 @@
         "act": "ค่า Regency 4150",
         "note": "",
         "opt": false,
-        "rest": false,
+        "rest": true,
         "map": ""
       }
     ]

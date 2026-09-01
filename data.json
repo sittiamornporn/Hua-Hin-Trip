@@ -214,7 +214,7 @@
         "act": "1. ห้องนอน",
         "note": "",
         "opt": false,
-        "rest": false,
+        "rest": true,
         "map": ""
       }
     ],

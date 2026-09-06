@@ -308,8 +308,13 @@
     },
     {
       "ico": "💸",
-      "label": "Icebath",
+      "label": "Icebath 480+120+150",
       "amount": 750
+    },
+    {
+      "ico": "💸",
+      "label": "ค่าพนักงาน",
+      "amount": 0
     }
   ]
 }

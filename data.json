@@ -305,6 +305,11 @@
       "ico": "💸",
       "label": "ข้าวครัวชัยนาท",
       "amount": 2280
+    },
+    {
+      "ico": "💸",
+      "label": "Icebath",
+      "amount": 0
     }
   ]
 }
